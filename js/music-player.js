@@ -4,7 +4,7 @@ const MUSIC_PREFIX = 'xy-home-v2:default';
 const NETEASE_API_BASE = "https://netease-cloud-music-api-backup-opal-phi.vercel.app";
 let neteaseCookie = ""; // 存储网易云登录cookie
 // 获取登录二维码
-async function getNeteaseQRCode() {
+window.getNeteaseQRCode = async function() {
   const res = await fetch(`${NETEASE_API_BASE}/login/qr?key=${Date.now()}&qrimg=true`);
   const data = await res.json();
   if(data.code === 800) {
@@ -14,13 +14,13 @@ async function getNeteaseQRCode() {
   return data.data;
 }
 // 查询扫码状态
-async function checkQRStatus(key) {
+window.checkQRStatus = async function() {
   const res = await fetch(`${NETEASE_API_BASE}/login/qr/check?key=${key}`);
   const data = await res.json();
   return data;
 }
 // 获取用户歌单（需要登录cookie）
-async function getUserPlayList(uid) {
+window.getUserPlayList = async function() {
   const res = await fetch(`${NETEASE_API_BASE}/user/playlist?uid=${uid}`, {
     headers: {
       "Cookie": neteaseCookie
@@ -30,7 +30,7 @@ async function getUserPlayList(uid) {
   return data.playlist;
 }
 // 导入歌单歌曲到mochi library
-async function importPlaylistTracks(playlistId) {
+window.importPlaylistTracks = async function() {
   const res = await fetch(`${NETEASE_API_BASE}/playlist/track/all?id=${playlistId}`,{
     headers:{
       "Cookie": neteaseCookie
