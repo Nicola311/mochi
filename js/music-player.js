@@ -2,7 +2,7 @@
 (function () {
 const MUSIC_PREFIX = 'xy-home-v2:default';
 // 之前是 localhost，现在改成你的 NATAPP 地址
-const NETEASE_API_BASE = "http://ud4ea655.natappfree.cc";
+const NETEASE_API_BASE = "https://lumpish-brethren-unsuited.ngrok-free.dev";
     let neteaseCookie = ""; // 存储网易云登录cookie
     let qrKey = ""; // 👈 新增：保存二维码的 unikey
 // 获取登录二维码
