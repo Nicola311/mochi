@@ -1,8 +1,8 @@
 (function () { try {
 (function () {
 const MUSIC_PREFIX = 'xy-home-v2:default';
-// 原来指向 Vercel 的代码删除或注释掉，改成这样：
-const NETEASE_API_BASE = "http://localhost:3000";
+// 之前是 localhost，现在改成你的 NATAPP 地址
+const NETEASE_API_BASE = "http://ud4ea655.natappfree.cc";
     let neteaseCookie = ""; // 存储网易云登录cookie
     let qrKey = ""; // 👈 新增：保存二维码的 unikey
 // 获取登录二维码
