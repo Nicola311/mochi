@@ -3,17 +3,18 @@
 const MUSIC_PREFIX = 'xy-home-v2:default';
 // 原来指向 Vercel 的代码删除或注释掉，改成这样：
 const NETEASE_API_BASE = "http://localhost:3000";
-let neteaseCookie = ""; // 存储网易云登录cookie
+    let neteaseCookie = ""; // 存储网易云登录cookie
+    let qrKey = ""; // 👈 新增：保存二维码的 unikey
 // 获取登录二维码
 window.getNeteaseQRCode = async function() {
     try {
         // 1. 先获取真实的 unikey
         const keyRes = await fetch(`${NETEASE_API_BASE}/login/qr/key?timestamp=${Date.now()}`);
         const keyData = await keyRes.json();
-        const unikey = keyData.data.unikey;
+         qrKey = keyData.data.unikey;
 
         // 2. 再用真实的 unikey 获取二维码
-        const res = await fetch(`${NETEASE_API_BASE}/login/qr/create?key=${unikey}&qrimg=true&timestamp=${Date.now()}`);
+        const res = await fetch(`${NETEASE_API_BASE}/login/qr/create?key=${qrKey}&qrimg=true&timestamp=${Date.now()}`);
         const data = await res.json();
         
         if (data.code === 200) {
@@ -30,7 +31,7 @@ window.getNeteaseQRCode = async function() {
 };
 // 查询扫码状态
 window.checkQRStatus = async function() {
-  const res = await fetch(`${NETEASE_API_BASE}/login/qr/check?key=${key}`);
+  const res = await fetch(`${NETEASE_API_BASE}/login/qr/check?key=${qrKey}`);
   const data = await res.json();
   return data;
 }
