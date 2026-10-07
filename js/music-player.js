@@ -9,7 +9,9 @@ const NETEASE_API_BASE = "https://lumpish-brethren-unsuited.ngrok-free.dev";
 window.getNeteaseQRCode = async function() {
     try {
         // 1. 先获取真实的 unikey
-        const keyRes = await fetch(`${NETEASE_API_BASE}/login/qr/key?timestamp=${Date.now()}`);
+       const keyRes = await fetch(`${NETEASE_API_BASE}/login/qr/key?timestamp=${Date.now()}`, {
+    headers: { 'ngrok-skip-browser-warning': 'true' }
+});
         const keyData = await keyRes.json();
          qrKey = keyData.data.unikey;
 
@@ -31,7 +33,9 @@ window.getNeteaseQRCode = async function() {
 };
 // 查询扫码状态
 window.checkQRStatus = async function() {
-  const res = await fetch(`${NETEASE_API_BASE}/login/qr/check?key=${qrKey}`);
+  const res = await fetch(`${NETEASE_API_BASE}/login/qr/check?key=${qrKey}&timestamp=${Date.now()}`, {
+    headers: { 'ngrok-skip-browser-warning': 'true' }
+});
   const data = await res.json();
   return data;
 }
