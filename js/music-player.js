@@ -4146,5 +4146,65 @@ try { syncTaFavTab(); renderTaFavList(); } catch (e) {}
 } catch (e) {}
 });
 })();
+  // 绑定网易云导入面板UI事件
+(function(){
+    const $qrBtn = document.getElementById("netease-qrcode-btn");
+    const $qrBox = document.getElementById("netease-qrcode-box");
+    const $userTip = document.getElementById("netease-user-tip");
+    const $plList = document.getElementById("netease-playlist-list");
+    let qrKey = "";
+    let qrPollTimer = null;
+
+    $qrBtn.onclick = async ()=>{
+        $qrBox.innerHTML = "";
+        $userTip.textContent = "正在获取二维码...";
+        const resData = await getNeteaseQRCode();
+        if(!resData){
+            $userTip.textContent = "二维码获取失败";
+            return;
+        }
+        qrKey = resData.key;
+        $qrBox.innerHTML = `<img src="${resData.qrimg}" style="width:200px;">`;
+        $userTip.textContent = "请打开网易云APP扫码登录";
+        startPoll();
+    }
+
+    function startPoll(){
+        if(qrPollTimer) clearInterval(qrPollTimer);
+        qrPollTimer = setInterval(async ()=>{
+            const ret = await checkQRStatus(qrKey);
+            if(ret.code === 800){
+                $userTip.textContent = "二维码过期，请重新生成";
+                clearInterval(qrPollTimer);
+            }else if(ret.code === 803){
+                $userTip.textContent = "登录成功，正在加载歌单";
+                clearInterval(qrPollTimer);
+                neteaseCookie = ret.cookie;
+                renderPlaylistList(ret.userId);
+            }
+        },2000)
+    }
+
+    async function renderPlaylistList(uid){
+        const playlists = await getUserPlayList(uid);
+        $plList.innerHTML = "";
+        playlists.forEach(pl=>{
+            const wrap = document.createElement("div");
+            wrap.className = "sm-tools";
+            wrap.innerHTML = `<span>${pl.name}</span><button class="sm-tool pl-import-btn" data-plid="${pl.id}">导入歌单</button>`;
+            $plList.appendChild(wrap);
+        })
+        //导入按钮
+        document.querySelectorAll(".pl-import-btn").forEach(btn=>{
+            btn.onclick = async ()=>{
+                const pid = btn.dataset.plid;
+                btn.innerText = "导入中…";
+                await importPlaylistTracks(pid);
+                btn.innerText = "导入完成";
+            }
+        })
+    }
+})();
+
 if (window.__mochiLoaded) window.__mochiLoaded.push("music-player.js");
 } catch (__e) { if (window.__mochiErrLoaded) window.__mochiErrLoaded.push("music-player.js"); try { console.error("[JS] music-player.js", __e && __e.message || __e); } catch (x) {} if (window.__jsErrors) window.__jsErrors.push("[music-player.js] " + String(__e && __e.message || __e)); } })();
