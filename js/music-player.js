@@ -5,13 +5,18 @@ const NETEASE_API_BASE = "https://netease-cloud-music-api-backup-opal-phi.vercel
 let neteaseCookie = ""; // 存储网易云登录cookie
 // 获取登录二维码
 window.getNeteaseQRCode = async function() {
-  const res = await fetch(`${NETEASE_API_BASE}/login/qr?key=${Date.now()}&qrimg=true`);
-  const data = await res.json();
-  if(data.code === 800) {
-    toast("二维码过期，请重新生成");
+  try{
+    const res = await fetch(`${NETEASE_API_BASE}/login/qr?key=${Date.now()}&qrimg=true`);
+    const data = await res.json();
+    if(data.code === 800) {
+      toast("二维码过期，请重新生成");
+      return null;
+    }
+    return data.data;
+  }catch(err){
+    console.error("接口错误：",err);
     return null;
   }
-  return data.data;
 }
 // 查询扫码状态
 window.checkQRStatus = async function() {
