@@ -1,7 +1,8 @@
 (function () { try {
 (function () {
 const MUSIC_PREFIX = 'xy-home-v2:default';
-const NETEASE_API_BASE = "https://netease-cloud-music-api-backup-opal-phi.vercel.app";
+// 原来指向 Vercel 的代码删除或注释掉，改成这样：
+const NETEASE_API_BASE = "http://localhost:3000";
 let neteaseCookie = ""; // 存储网易云登录cookie
 // 获取登录二维码
 window.getNeteaseQRCode = async function() {
