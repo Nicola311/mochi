@@ -1,7 +1,7 @@
 (function () { try {
 (function () {
 const MUSIC_PREFIX = 'xy-home-v2:default';
-const NETEASE_API_BASE = "https://netease-cloud-music-api-backup-opal-phi.vercel.app/";
+const NETEASE_API_BASE = "https://netease-cloud-music-api-backup-opal-phi.vercel.app";
 let neteaseCookie = ""; // 存储网易云登录cookie
 // 获取登录二维码
 window.getNeteaseQRCode = async function() {
