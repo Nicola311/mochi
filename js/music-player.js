@@ -5,19 +5,28 @@ const NETEASE_API_BASE = "https://netease-cloud-music-api-backup-opal-phi.vercel
 let neteaseCookie = ""; // 存储网易云登录cookie
 // 获取登录二维码
 window.getNeteaseQRCode = async function() {
-  try{
-    const res = await fetch(`${NETEASE_API_BASE}/login/qr?key=${Date.now()}&qrimg=true`);
-    const data = await res.json();
-    if(data.code === 800) {
-      toast("二维码过期，请重新生成");
-      return null;
+    try {
+        // 1. 先获取真实的 unikey
+        const keyRes = await fetch(`${NETEASE_API_BASE}/login/qr/key?timestamp=${Date.now()}`);
+        const keyData = await keyRes.json();
+        const unikey = keyData.data.unikey;
+
+        // 2. 再用真实的 unikey 获取二维码
+        const res = await fetch(`${NETEASE_API_BASE}/login/qr/create?key=${unikey}&qrimg=true&timestamp=${Date.now()}`);
+        const data = await res.json();
+        
+        if (data.code === 200) {
+            return data.data;
+        } else {
+            console.error("生成二维码失败", data);
+            toast("生成二维码失败，请重试");
+            return null;
+        }
+    } catch(err) {
+        console.error("接口错误: ", err);
+        return null;
     }
-    return data.data;
-  }catch(err){
-    console.error("接口错误：",err);
-    return null;
-  }
-}
+};
 // 查询扫码状态
 window.checkQRStatus = async function() {
   const res = await fetch(`${NETEASE_API_BASE}/login/qr/check?key=${key}`);
