@@ -1,6 +1,70 @@
 (function () { try {
 (function () {
 const MUSIC_PREFIX = 'xy-home-v2:default';
+const NETEASE_API_BASE = "https://netease-cloud-music-api-backup-opal-phi.vercel.app";
+let neteaseCookie = ""; // 存储网易云登录cookie
+// 获取登录二维码
+async function getNeteaseQRCode() {
+  const res = await fetch(`${NETEASE_API_BASE}/login/qr?key=${Date.now()}&qrimg=true`);
+  const data = await res.json();
+  if(data.code === 800) {
+    toast("二维码过期，请重新生成");
+    return null;
+  }
+  return data.data;
+}
+// 查询扫码状态
+async function checkQRStatus(key) {
+  const res = await fetch(`${NETEASE_API_BASE}/login/qr/check?key=${key}`);
+  const data = await res.json();
+  return data;
+}
+// 获取用户歌单（需要登录cookie）
+async function getUserPlayList(uid) {
+  const res = await fetch(`${NETEASE_API_BASE}/user/playlist?uid=${uid}`, {
+    headers: {
+      "Cookie": neteaseCookie
+    }
+  });
+  const data = await res.json();
+  return data.playlist;
+}
+// 导入歌单歌曲到mochi library
+async function importPlaylistTracks(playlistId) {
+  const res = await fetch(`${NETEASE_API_BASE}/playlist/track/all?id=${playlistId}`,{
+    headers:{
+      "Cookie": neteaseCookie
+    }
+  })
+  const data = await res.json();
+  const tracks = data.songs;
+  for(let track of tracks) {
+    const songItem = {
+      id: track.id,
+      name: track.name,
+      artist: track.ar.map(a=>a.name).join("/"),
+      source: "netease",
+      trackId: track.id,
+      duration: track.dt / 1000
+    }
+    library.push(songItem);
+  }
+  toast("歌单导入完成！");
+}
+async function getNeteaseSongUrl(songId) {
+  const res = await fetch(`${NETEASE_API_BASE}/song/url?id=${songId}`,{
+    headers:{
+      "Cookie": neteaseCookie
+    }
+  })
+  const data = await res.json();
+  if(data.data[0]?.url) {
+    return data.data[0].url
+  }else{
+    toast("无法获取播放链接，VIP歌曲需要登录有效cookie");
+    return null;
+  }
+}
 const store = window.storeFor('default');
 function toast(msg) {
 let t = document.getElementById('cc-toast');
